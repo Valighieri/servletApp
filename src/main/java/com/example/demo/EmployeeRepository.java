@@ -8,11 +8,11 @@ import java.util.Optional;
 
 public final class EmployeeRepository {
 
-    /*public static void main(String[] args) {
-        getConnection();
-        Employee employee = new Employee("Takeshi", "takeshi.jp@jmail.jp", "Japan");
-        save(employee);
-    }*/
+//    public static void main(String[] args) {
+//        getConnection();
+//        Employee employee = new Employee("Takeshi", "takeshi.jp@jmail.jp", "Japan");
+//        save(employee);
+//    }
 
     public static Connection getConnection() {
 
@@ -53,11 +53,10 @@ public final class EmployeeRepository {
     }
 
     public static int update(Employee employee) {
-
         int status = 0;
 
-        try {
-            Connection connection = EmployeeRepository.getConnection();
+        try(Connection connection = EmployeeRepository.getConnection()) {
+
             PreparedStatement ps = connection.prepareStatement("update users set name=?,email=?,country=? where id=?");
 
             ps.setString(1, employee.name());
@@ -66,7 +65,6 @@ public final class EmployeeRepository {
             ps.setInt(4, employee.id());
 
             status = ps.executeUpdate();
-            connection.close();
 
         } catch (SQLException sqlException) {
             sqlException.printStackTrace();
@@ -75,17 +73,12 @@ public final class EmployeeRepository {
     }
 
     public static int delete(int id) {
-
         int status = 0;
 
-        try {
-            Connection connection = EmployeeRepository.getConnection();
+        try(Connection connection = EmployeeRepository.getConnection()) {
             PreparedStatement ps = connection.prepareStatement("delete from users where id=?");
             ps.setInt(1, id);
             status = ps.executeUpdate();
-
-            connection.close();
-
         } catch (SQLException exception) {
             exception.printStackTrace();
         }
@@ -121,16 +114,13 @@ public final class EmployeeRepository {
     }
 
     public static List<Employee> getAllEmployees() {
-
         List<Employee> listEmployees = new ArrayList<>();
 
-        try {
-            Connection connection = EmployeeRepository.getConnection();
+        try(Connection connection = EmployeeRepository.getConnection()) {
             PreparedStatement ps = connection.prepareStatement("select * from users");
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
-
                 Employee employee = new Employee(
                         rs.getInt(1),
                         rs.getString(2),
@@ -139,7 +129,6 @@ public final class EmployeeRepository {
 
                 listEmployees.add(employee);
             }
-            connection.close();
 
         } catch (SQLException e) {
             e.printStackTrace();
